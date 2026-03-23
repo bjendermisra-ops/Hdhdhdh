@@ -19,8 +19,8 @@
          .icnn.center-btn { transform: translateY(-20px); background: linear-gradient(135deg, var(--primary-color), #FF7696); width: 65px; height: 65px; border-radius: 50%; box-shadow: 0 10px 25px rgba(255, 90, 122, 0.4); border: 4px solid #FEF1F6;}
          .icnn.center-btn svg { stroke: #fff; width: 28px; height: 28px;}
          body.preg-mode .icnn.center-btn { background: linear-gradient(135deg, #5AA1FF, #76CEFF); box-shadow: 0 10px 25px rgba(90, 161, 255, 0.4); border-color: #F1F8FE;}
-         .switch-line {display:flex; justify-content:space-between; align-items:center; margin-top:20px; margin-bottom:5px; border-top:1px dashed #EAEAEA; padding-top:20px;}
-         .tgld input { display:none;} .slider { width:50px; height:28px; border-radius:28px; background:#E0E0E0; position:relative; transition:0.3s; cursor:pointer;} .slider:before{content:"";position:absolute; width:22px;height:22px;border-radius:50%; background:#fff; top:3px;left:3px; transition:0.4s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.1);} .tgld input:checked + .slider {background: #1CC489;} .tgld input:checked + .slider:before{transform:translateX(22px);} 
+         .switch-line {display:flex; justify-content:space-between; align-items:center; margin-top:15px; border-top:1px dashed #EAEAEA; padding-top:15px;}
+         .tgld input { display:none;} .slider { width:46px; height:24px; border-radius:24px; background:#E0E0E0; position:relative; transition:0.3s; cursor:pointer;} .slider:before{content:"";position:absolute; width:18px;height:18px;border-radius:50%; background:#fff; top:3px;left:3px; transition:0.4s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.1);} .tgld input:checked + .slider {background: #1CC489;} .tgld input:checked + .slider:before{transform:translateX(22px);} 
          .btnx {width:100%; background:linear-gradient(135deg, var(--primary-color), #FF7696); padding:18px; border-radius:20px; color:white; font-size:16px; font-weight:800; border:none; transition:0.3s; cursor: pointer; box-shadow: 0 8px 20px rgba(255, 90, 122, 0.3);} .btnx:active { transform: scale(0.97); }
          body.preg-mode .btnx {background: linear-gradient(135deg, #5AA1FF, #76CEFF); box-shadow: 0 8px 20px rgba(90, 161, 255, 0.3);}
          .act-pop { position:fixed; z-index:99999; top:0; left:0; right:0; bottom:0; display:none; flex-direction:column; justify-content:center; align-items:center; background:rgba(0,0,0,0.5); backdrop-filter: blur(5px); animation:inop 0.4s; }
@@ -28,6 +28,7 @@
          .ckm { width:80px; height:80px; background:linear-gradient(135deg, #1CC489, #2CD99E); border-radius:50%; margin: 0 auto 20px; display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 20px rgba(28, 196, 137, 0.3); }
          .ckm svg {width:45px; height:45px; fill:none; stroke:#fff; stroke-width:4; stroke-linecap:round; stroke-linejoin:round;}
          @keyframes inop {from{opacity:0;}to{opacity:1;}}
+         .sub-text {font-size:12px; color:#888; font-weight:600; margin-top:4px;}
     </style>
 </head>
 <body>
@@ -41,16 +42,42 @@
          </select>
     </div>
 
+    <!-- 🚀 ULTRA POWERFUL NOTIFICATION ENGINE PANEL -->
     <div class="crd" style="box-shadow:0 0 0 2px rgba(28,196,137,0.3), 0 15px 35px rgba(28,196,137,0.1)">
-         <label style="color:#1CC489; font-size: 16px; display:flex; align-items:center; gap:8px;" data-hi="स्मार्ट हेल्थ अलर्ट सिस्टम ✨" data-en="Smart Health Alerts ✨"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg> स्मार्ट हेल्थ अलर्ट</label>
+         <label style="color:#1CC489; font-size: 16px; display:flex; align-items:center; gap:8px;" data-hi="स्मार्ट हेल्थ अलर्ट सिस्टम ✨" data-en="Smart Health Alerts ✨"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg> स्मार्ट अलर्ट्स</label>
          
-         <div class="switch-line" style="margin-top:10px; padding-top:15px; border-color: rgba(28,196,137,0.2);">
-            <span style="font-weight:800; font-size:16px; color:#333;" data-en="Enable Tracking Alerts" data-hi="रिमाइंडर और अलर्ट चालू रखें"></span>
-            <label class="tgld"><input type="checkbox" id="toglPushSet"><div class="slider"></div></label>
+         <div class="switch-line" style="border:none; padding-top:10px;">
+            <span style="font-weight:800; font-size:16px; color:#333;" data-en="Main Alert System" data-hi="मुख्य अलर्ट चालू रखें"></span>
+            <label class="tgld"><input type="checkbox" id="toglPushSet" onchange="toggleSubOptions()"><div class="slider"></div></label>
+         </div>
+
+         <!-- 🚀 NEW PREMIUM TOGGLES -->
+         <div id="subOpts" style="background: #F8FCFA; border-radius: 20px; padding: 10px 15px; margin-top: 10px; border: 1px solid #D5F5E3;">
+             <div class="switch-line" style="border:none; padding-top:5px;">
+                <div>
+                    <span style="font-weight:700; font-size:14px; color:#333;" data-hi="🩸 पीरियड और डेट अलर्ट" data-en="🩸 Period & Ovulation Alerts"></span>
+                    <div class="sub-text" data-hi="डेट्स और क्रैम्प्स का रिमाइंडर" data-en="Reminders for upcoming dates"></div>
+                </div>
+                <label class="tgld"><input type="checkbox" id="prefPeriod"><div class="slider"></div></label>
+             </div>
+             <div class="switch-line">
+                <div>
+                    <span style="font-weight:700; font-size:14px; color:#333;" data-hi="💧 पानी और हाइड्रेशन" data-en="💧 Hydration Reminders"></span>
+                    <div class="sub-text" data-hi="दिनभर में पानी पीने की याद दिलाएं" data-en="Track and remind water intake"></div>
+                </div>
+                <label class="tgld"><input type="checkbox" id="prefWater"><div class="slider"></div></label>
+             </div>
+             <div class="switch-line">
+                <div>
+                    <span style="font-weight:700; font-size:14px; color:#333;" data-hi="✨ लव और मोटिवेशन" data-en="✨ Daily Motivation"></span>
+                    <div class="sub-text" data-hi="मूड अच्छा रखने के लिए प्यारे मैसेज" data-en="Sweet messages to boost mood"></div>
+                </div>
+                <label class="tgld"><input type="checkbox" id="prefLove"><div class="slider"></div></label>
+             </div>
          </div>
 
          <label style="margin-top:20px;" data-hi="अलर्ट कितनी बार चाहिए?" data-en="Alert Frequency Level"></label>
-         <select id="tAlertMode" style="border:2px solid #1CC489; background: #F2FCF8; color: #108E61;">
+         <select id="tAlertMode" style="border:2px solid #1CC489; background: #fff; color: #108E61;">
              <option value="DAILY">रोजाना एक बार (Daily) 🌅</option>
              <option value="EVERY_1_HR">हर 1 घंटे में याद दिलाएं ⏰</option>
              <option value="EVERY_3_HR">हर 3 घंटे में अलर्ट 🔔</option>
@@ -65,7 +92,7 @@
          </button>
 
          <div style="margin-top: 25px; border-top:1px dashed #EAEAEA; padding-top:20px; text-align:center;">
-             <p style="font-size: 13px; color:#888; font-weight:600; line-height:1.5; margin-bottom: 15px;" data-hi="आपके नाम के साथ लाइव टेस्टिंग करें।" data-en="Run a live test push with your real name."></p>
+             <p style="font-size: 13px; color:#888; font-weight:600; line-height:1.5; margin-bottom: 15px;" data-hi="आपके नाम और पसंद के साथ लाइव टेस्टिंग करें।" data-en="Run a live test push with your preferences."></p>
              <button onclick="pingHardPush()" class="btnx" style="background:#222; box-shadow: 0 8px 20px rgba(0,0,0,0.2); padding: 14px;" data-en="Trigger Live Test Alarm 📱" data-hi="लाइव टेस्टिंग अलार्म भेजें 📱"></button>
          </div>
     </div>
@@ -98,25 +125,39 @@
 
     <script>
         const amData = JSON.parse(localStorage.getItem('userData'));
-        let configBase = JSON.parse(localStorage.getItem('appConfig')) || { lang: 'hi', pregMode:false };
-        
+        let configBase = JSON.parse(localStorage.getItem('appConfig')) || { lang: 'hi', pregMode:false, alerts:{period:true, water:true, love:true} };
+        if(!configBase.alerts) configBase.alerts = {period:true, water:true, love:true};
+
         function bootOps() {
              document.getElementById('uxLangPref').value = configBase.lang;
              if(configBase.pregMode) { document.getElementById('mDSwitchPg').checked = true; document.body.classList.add('preg-mode');}
+             
              document.getElementById('toglPushSet').checked = localStorage.getItem('masterToglStatus') !== "NO"; 
+             document.getElementById('prefPeriod').checked = configBase.alerts.period;
+             document.getElementById('prefWater').checked = configBase.alerts.water;
+             document.getElementById('prefLove').checked = configBase.alerts.love;
+             
              document.getElementById('tAlertMode').value = localStorage.getItem('lastFreqKey') || "DAILY";
-             transTxt();
+             toggleSubOptions(); transTxt();
         }
         function runTranslateAppLine(valX){ configBase.lang=valX; localStorage.setItem('appConfig', JSON.stringify(configBase)); location.reload();}
         function runSaveFutureSys(vx) { configBase.pregMode=vx; localStorage.setItem('appConfig', JSON.stringify(configBase)); location.reload(); }
         function transTxt(){ document.querySelectorAll('[data-'+configBase.lang+']').forEach(a=>{ a.innerText = a.getAttribute('data-'+configBase.lang);}); }
+        function toggleSubOptions() {
+            document.getElementById('subOpts').style.opacity = document.getElementById('toglPushSet').checked ? "1" : "0.4";
+            document.getElementById('subOpts').style.pointerEvents = document.getElementById('toglPushSet').checked ? "auto" : "none";
+        }
 
         // --- 🧠 SMART JAVA SYNC ---
         function syncWithAndroid(isOkeyStatus, remIdexLox) {
             if (!window.Android || !window.Android.scheduleSmartAlarm || !amData) return;
             try {
                 let wtState = JSON.parse(localStorage.getItem('waterLog')) || { count: 0 };
-                window.Android.scheduleSmartAlarm(amData.lastDate, amData.cycleLength.toString(), isOkeyStatus ? remIdexLox : "OFF", configBase.lang, amData.name || "Beautiful", wtState.count);
+                window.Android.scheduleSmartAlarm(
+                    amData.lastDate, amData.cycleLength.toString(), isOkeyStatus ? remIdexLox : "OFF", 
+                    configBase.lang, amData.name || "Beautiful", wtState.count,
+                    configBase.alerts.period, configBase.alerts.water, configBase.alerts.love
+                );
             } catch(e) {}
         }
 
@@ -126,15 +167,22 @@
              
              let isOkeyStatus = document.getElementById('toglPushSet').checked; 
              let remIdexLox = document.getElementById('tAlertMode').value; 
+             
+             // Save advanced preferences
+             configBase.alerts.period = document.getElementById('prefPeriod').checked;
+             configBase.alerts.water = document.getElementById('prefWater').checked;
+             configBase.alerts.love = document.getElementById('prefLove').checked;
+
              localStorage.setItem('masterToglStatus', isOkeyStatus ? "YES" : "NO");
              localStorage.setItem('lastFreqKey', remIdexLox); 
+             localStorage.setItem('appConfig', JSON.stringify(configBase));
 
-             syncWithAndroid(isOkeyStatus, remIdexLox); // SYNC SAVED CONFIG TO ANDROID SMART BRAIN
+             syncWithAndroid(isOkeyStatus, remIdexLox); 
 
              const nmA = (amData.name || "Beautiful");
              document.getElementById('aTxkNm').innerText = isOkeyStatus ? `Done, ${nmA}! 💖` : `Alerts OFF`;
-             let cxXn = isOkeyStatus ? `आपके अलार्म (${remIdexLox}) सेट कर दिए गए हैं। हम आपका ख्याल रखेंगे!` : `आपके नोटिफिकेशन्स बंद कर दिए गए हैं। ✔`;
-             if(configBase.lang=='en') cxXn = isOkeyStatus ? `Alarms updated to ${remIdexLox}. We've got your back!` : 'Notifications securely turned off.';
+             let cxXn = isOkeyStatus ? `अलार्म सेट हो गए हैं। आपके चुने हुए ऑप्शन्स आपको याद दिलाए जाएंगे!` : `आपके नोटिफिकेशन्स बंद कर दिए गए हैं। ✔`;
+             if(configBase.lang=='en') cxXn = isOkeyStatus ? `Smart alarms updated successfully!` : 'Notifications securely turned off.';
 
              document.getElementById('aTxkBm').innerText = cxXn;
              document.getElementById('actMdck').classList.add('op'); 
@@ -143,7 +191,7 @@
 
         function pingHardPush() {
              if(!amData) return;
-             try{ if(window.Android && window.Android.testNotificationNow) window.Android.testNotificationNow(amData.name, configBase.lang=='hi'?"टेस्ट सफल रहा! आपका अलर्ट सिस्टम काम कर रहा है। 🌸":"Test successful! Your alert system is active. 🌸"); }catch(dce){}
+             try{ if(window.Android && window.Android.testNotificationNow) window.Android.testNotificationNow(amData.name, configBase.lang=='hi'?"टेस्ट सफल रहा! आपका स्मार्ट अलर्ट सिस्टम बिल्कुल परफेक्ट काम कर रहा है। 🌸":"Test successful! Your smart alert system is perfectly active. 🌸"); }catch(dce){}
              
              document.getElementById('aTxkNm').innerText = "Testing... 🚀";
              document.getElementById('aTxkBm').innerText = configBase.lang=='hi' ? `प्रिय ${amData.name}, आपको तुरंत एक टेस्ट अलार्म मिलेगा!` : `Direct User: ${amData.name}, test alarm triggered!`;
