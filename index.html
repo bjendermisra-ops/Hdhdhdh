@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Glow Wellness Tracker</title>
+    <style>
+        :root {
+            --bg-color: #FEF1F6;
+            --primary-color: #FF5A7A;
+            --primary-grad: linear-gradient(135deg, #FF5A7A, #FF7696);
+            --card-bg: #FFFFFF;
+            --text-dark: #2B2B32;
+            --text-muted: #8E8D93;
+            --shadow-soft: 0 15px 40px rgba(255, 90, 122, 0.08);
+            --modal-bg: rgba(0,0,0,0.5);
+        }
+        body.preg-mode {
+            --bg-color: #F1F8FE;
+            --primary-color: #5AA1FF;
+            --primary-grad: linear-gradient(135deg, #5AA1FF, #76CEFF);
+            --shadow-soft: 0 15px 40px rgba(90, 161, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0 0 120px 0; background: var(--bg-color); font-family: 'SF Pro Display', -apple-system, sans-serif; color: var(--text-dark); transition: background 0.4s;}
+        
+        .card { background: var(--card-bg); margin: 0 20px 20px; border-radius: 35px; padding: 30px 24px; box-shadow: var(--shadow-soft); transition: 0.3s; position: relative;}
+        input, select { width: 100%; padding: 16px 20px; margin-bottom: 20px; border: 1.5px solid #EAEAEA; border-radius: 20px; font-size: 16px; background: #F8F9FA; color: var(--text-dark); outline:none; font-weight: 600; transition: 0.3s;}
+        input:focus, select:focus { border-color: var(--primary-color); background: #fff;}
+        .btn { width: 100%; background: var(--primary-grad); color: white; padding: 18px; border: none; border-radius: 22px; font-weight: 800; font-size: 16px; cursor:pointer; margin-top:10px; transition:0.3s; box-shadow: 0 8px 20px rgba(255, 90, 122, 0.3);}
+        .btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(255, 90, 122, 0.2);}
+        body.preg-mode .btn {box-shadow: 0 8px 20px rgba(90, 161, 255, 0.3);}
+        
+        .top-hero { padding: 45px 24px 10px 24px; }
+        .greet { font-size: 28px; font-weight: 800; margin:0; line-height: 1.2; letter-spacing: -0.5px;}
+        
+        .timer-box { margin-top: 15px; display:inline-block; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding:12px 24px; border-radius:24px; border:1px solid rgba(255,255,255,0.5); display: flex; align-items:center; gap: 12px; max-width: 90%; margin-left: auto; margin-right: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.03);}
+        .t-chunk { font-size: 22px; font-weight: 800; color: var(--primary-color); display:flex; flex-direction:column; align-items:center; min-width:35px; }
+        .t-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-top: 2px;}
+        .sep { font-weight: 800; color:var(--text-muted); padding-bottom:15px; font-size: 18px;}
+
+        .circ-wrap { display: flex; justify-content: center; position: relative; margin: 10px 0 25px; }
+        .circ-progress { position:relative; width: 280px; height: 280px; display:flex; justify-content:center; align-items:center; }
+        .circ-bg, .circ-ring { stroke-width: 16; fill: none; r: 120; cx: 140; cy: 140;}
+        .circ-bg { stroke: #FFF; box-shadow: var(--shadow-soft);}
+        .circ-ring { stroke: url(#dynamicGrad); stroke-linecap: round; stroke-dasharray: 754; stroke-dashoffset: 754; transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1); transform: rotate(-90deg); transform-origin: 50% 50%;}
+        
+        .inner-plate { width: 235px; height: 235px; background: #fff; border-radius: 50%; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position:absolute; display:flex; flex-direction:column; justify-content:center; align-items:center; border: 6px solid #FEF1F6;}
+        body.preg-mode .inner-plate { border-color: #F1F8FE;}
+        .main-huge { font-size: 70px; font-weight: 800; line-height: 1; letter-spacing: -3px; color: var(--text-dark);}
+        .p-stat { color:#fff; background: var(--primary-grad); padding:8px 20px; border-radius: 20px; font-weight: 800; font-size:13px; margin-bottom:8px; box-shadow: 0 4px 10px rgba(255, 90, 122, 0.3);}
+
+        .card-dual { display: grid; grid-template-columns: 1fr 1fr; gap:15px; margin: 0 20px; }
+        .edit-icn { cursor:pointer; width:36px; height:36px; background:var(--primary-color); color:white; border-radius:12px; display:flex; align-items:center; justify-content:center; opacity: 0.9; box-shadow: 0 4px 10px rgba(255, 90, 122, 0.3); transition: 0.3s;} .edit-icn:active{ transform:scale(0.9); }
+
+        /* Floating Glass Nav */
+        .navbar-base { position:fixed; bottom: 20px; left: 20px; right: 20px; height: 75px; display:flex; justify-content:space-around; align-items:center; background:rgba(255,255,255,0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index:9999; border-radius: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5);}
+        .nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; width: 60px; height: 100%; cursor: pointer; color: #B0AFB5;}
+        .nav-link.active { color: var(--primary-color); }
+        .nav-link .icon { width:26px; height:26px; margin-bottom: 2px;}
+        .nav-link .icon svg { stroke: currentColor; fill:none; stroke-width: 2.2; stroke-linecap: round; width:100%; height:100%; transition:0.3s;}
+        .nav-link.active .icon svg { transform: translateY(-3px) scale(1.1); }
+        .nav-link.center-btn { transform: translateY(-20px); background: linear-gradient(135deg, var(--primary-color), #FF7696); width: 65px; height: 65px; border-radius: 50%; box-shadow: 0 10px 25px rgba(255, 90, 122, 0.4); border: 4px solid #FEF1F6;}
+        .nav-link.center-btn .icon { margin:0; width: 28px; height: 28px;}
+        .nav-link.center-btn .icon svg { stroke: #fff;}
+        body.preg-mode .nav-link.center-btn { background: linear-gradient(135deg, #5AA1FF, #76CEFF); box-shadow: 0 10px 25px rgba(90, 161, 255, 0.4); border-color: #F1F8FE;}
+
+        .modal { position:fixed; inset:0; z-index:99999; background:var(--modal-bg); backdrop-filter: blur(5px); display:none; justify-content:center; align-items:flex-end; padding-bottom:env(safe-area-inset-bottom); animation: fade 0.3s;}
+        .modal-body { width: 100%; background: #fff; padding:35px 24px; border-radius: 40px 40px 0 0; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.1, 1, 0.3, 1);}
+        .modal.open { display:flex; } .modal.open .modal-body { transform:translateY(0); }
+        
+        #gToast { visibility: hidden; position: fixed; bottom:120px; left: 50%; transform: translateX(-50%); background:#222; color:white; padding:16px 24px; border-radius: 30px; z-index: 100000; box-shadow:0 10px 25px rgba(0,0,0,0.2); font-size:15px; font-weight: 700; opacity:0; transition:0.3s; display:flex; align-items:center; gap:10px; width:max-content; max-width: 90%;}
+        #gToast.show { visibility: visible; opacity:1; bottom: 110px; }
+        @keyframes fade {from {opacity:0} to {opacity:1}}
+
+        .quote-box { background: rgba(255, 255, 255, 0.6); padding: 12px 20px; border-radius: 20px; margin: 0 24px 15px; font-style: italic; color: #555; font-weight: 600; font-size: 14px; text-align: center; border: 1px dashed rgba(255, 90, 122, 0.3); }
+        .water-grid { display: flex; gap: 8px; justify-content: space-between; margin-top: 15px; }
+        .glass-btn { width: 35px; height: 40px; border-radius: 8px; background: #EAEAEA; display:flex; align-items:center; justify-content:center; font-size: 20px; cursor: pointer; transition: 0.3s; }
+        .glass-btn.filled { background: #5AA1FF; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(90, 161, 255, 0.4); }
+        
+        .relax-btn-huge { width: calc(100% - 40px); margin: 20px; background: linear-gradient(135deg, #8A2BE2, #DDA0DD); color: white; border-radius: 25px; padding: 20px; text-align: center; font-weight: 800; font-size: 16px; box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3); cursor: pointer; transition: 0.3s; display:flex; justify-content:center; align-items:center; gap:10px;}
+        .relax-btn-huge:active { transform: scale(0.97); }
+
+        .breath-circle { width: 160px; height: 160px; background: linear-gradient(135deg, #8A2BE2, #DDA0DD); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 22px; margin: 40px auto; transition: all 4s ease-in-out; box-shadow: 0 0 50px rgba(138, 43, 226, 0.5); }
+        .breath-scale-up { transform: scale(1.6); }
+    </style>
+</head>
+<body>
+    <div id="gToast"><span id="gToastIco">✨</span><span id="gToastMsg"></span></div>
+
+    <!-- MAIN REGISTRATION WRAPPER -->
+    <div id="initGate" style="display: none; padding-top:12vh;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size:48px; font-weight:800; color:var(--primary-color); letter-spacing: -1px;">Glow<span style="color:#222;">Track</span></div>
+            <p style="color:var(--text-muted); font-weight:600; font-size: 16px; margin-top:5px;" data-en="Your delicate health companion 💖" data-hi="आपके स्वास्थ्य की सच्ची सहेली 💖">...</p>
+        </div>
+        
+        <div class="card">
+            <h2 data-en="Let's personalize your care 🌸" data-hi="शुरुआत करने के लिए प्रोफाइल भरें 🌸" style="text-align:center; margin-top:0; color:#222;"></h2>
+            
+            <label style="font-weight:700; margin-left: 5px;" data-en="Your Beautiful Name" data-hi="आपका प्यारा सा नाम"></label>
+            <input type="text" id="regUser" placeholder="e.g. Suhana">
+            
+            <label style="font-weight:700; margin-left: 5px;" data-en="Your Age" data-hi="आपकी उम्र"></label>
+            <input type="number" id="regAge" placeholder="24">
+
+            <label style="font-weight:700; margin-left: 5px;" data-en="Last Period Date (First day of bleeding)" data-hi="माहवारी शुरू होने का आखिरी दिन"></label>
+            <input type="date" id="regDate">
+            
+            <div style="display:flex; gap:15px;">
+                <div style="flex:1;">
+                    <label style="font-size:13px; font-weight:700; margin-left:5px;" data-en="Cycle (Days)" data-hi="मासिक चक्र (दिन)"></label>
+                    <input type="number" id="regCycle" value="28">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:13px; font-weight:700; margin-left:5px;" data-en="Bleed (Days)" data-hi="रक्तस्राव (दिन)"></label>
+                    <input type="number" id="regFlow" value="5">
+                </div>
+            </div>
+
+            <label style="font-size:13px; font-weight:700; margin-left:5px; margin-top: 5px;" data-en="Select Preferred Language" data-hi="अपनी भाषा चुनें"></label>
+            <select id="regLangPref" onchange="testTempSwitch(this.value)">
+                <option value="en">English (Global) 🌍</option>
+                <option value="hi" selected>हिंदी (मातृभाषा) 🌸</option>
+            </select>
+            
+            <button class="btn" onclick="saveAuth()" data-en="Start My Healing Journey 🚀" data-hi="मेरा ट्रैकर शुरू करें 🚀">..</button>
+        </div>
+    </div>
+
+    <!-- PRODUCTION LIVE DASHBOARD -->
+    <div id="dashBoardGate" style="display: none;">
+        <div class="top-hero">
+            <h1 class="greet" data-hi="नमस्ते, <span id='usrNm'>-</span> 🌸" data-en="Hello, <span id='usrNm'>-</span> 🌸">नमस्ते...</h1>
+            <p style="font-weight: 600; font-size:16px; margin-top:8px; color:var(--text-muted); line-height: 1.4;" id="ovPhaseMsg">--</p>
+        </div>
+
+        <div class="quote-box" id="dailyQuoteTxt">"आप जैसी हैं, बहुत खूबसूरत और स्ट्रॉन्ग हैं। 💖"</div>
+        
+        <div class="circ-wrap">
+            <svg class="circ-progress">
+                <defs>
+                    <linearGradient id="dynamicGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#FF5A7A" id="gdCol1" />
+                        <stop offset="100%" stop-color="#FF7696" id="gdCol2" />
+                    </linearGradient>
+                </defs>
+                <circle class="circ-bg" cx="140" cy="140" r="120"></circle>
+                <circle class="circ-ring" cx="140" cy="140" r="120" id="cStroke"></circle>
+            </svg>
+            <div class="inner-plate">
+                <span class="p-stat" id="progPillsTag">Predicting...</span>
+                <span class="main-huge" id="txtDaysVal">--</span>
+                <span style="font-weight:800; color:#888; margin-top:8px; font-size:16px; text-transform: uppercase; letter-spacing: 1px;" id="lblTimer" data-hi="दिन बचे हैं" data-en="Days Left">Days</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center; width: 100%;">
+            <div class="timer-box" id="timeCounter">
+                <div class="t-chunk"><span id="ltH">00</span><span class="t-label">Hr</span></div> <span class="sep">:</span>
+                <div class="t-chunk"><span id="ltM">00</span><span class="t-label">Min</span></div> <span class="sep">:</span>
+                <div class="t-chunk"><span id="ltS">00</span><span class="t-label">Sec</span></div>
+            </div>
+        </div>
+
+        <div class="relax-btn-huge" onclick="openBreathModal()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
+            <span data-hi="सांस लें और रिलैक्स करें 🌿" data-en="Breathe & Relax 🌿"></span>
+        </div>
+
+        <div class="card-dual">
+            <div class="card" style="padding: 20px; border-radius: 25px;">
+                <h4 style="color:var(--text-muted); font-size:13px; margin:0; font-weight:700;" data-en="Cycle Length" data-hi="साइकिल की लंबाई">--</h4>
+                <div style="font-size:24px; font-weight: 800; display:flex; justify-content:space-between; align-items:center; margin-top:8px; color:#222;">
+                    <span id="cTxtDt">28 D</span> 
+                    <div class="edit-icn" onclick="popEditor()"><svg viewBox="0 0 24 24" width="16" fill="white"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+                </div>
+            </div>
+            <div class="card" style="padding: 20px; border-radius: 25px;">
+                 <h4 style="color:var(--text-muted); font-size:13px; margin:0; font-weight:700;" data-hi="अगली डेट" data-en="Expected Start">--</h4>
+                 <div style="font-size:24px; font-weight: 800; color:var(--primary-color); margin-top:8px;" id="cNxDt">24 Mar</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:20px; border-radius:30px;">
+            <h3 style="margin:0; font-size:18px; color:#333; display:flex; justify-content:space-between;">
+                <span data-hi="💧 पानी पीना न भूलें" data-en="💧 Stay Hydrated"></span>
+                <span id="wCount" style="color:#5AA1FF;">0/6</span>
+            </h3>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#888; font-weight:600;" data-hi="खुद को हाइड्रेटेड रखें, इससे दर्द में आराम मिलेगा।" data-en="Drinking water reduces cramps significantly."></p>
+            <div class="water-grid">
+                <div class="glass-btn" onclick="tgWater(this, 0)">🥛</div>
+                <div class="glass-btn" onclick="tgWater(this, 1)">🥛</div>
+                <div class="glass-btn" onclick="tgWater(this, 2)">🥛</div>
+                <div class="glass-btn" onclick="tgWater(this, 3)">🥛</div>
+                <div class="glass-btn" onclick="tgWater(this, 4)">🥛</div>
+                <div class="glass-btn" onclick="tgWater(this, 5)">🥛</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modaleditor" onclick="if(event.target==this) closeEditor()">
+        <div class="modal-body">
+            <h2 data-en="Adjust Your Cycle Details" data-hi="डायरी विवरण ठीक करें" style="margin-top:0; color:#222;">Fix Record</h2>
+            <br>
+            <label style="font-weight:700;" data-hi="आखरी माहवारी की तारीख" data-en="Last recorded cycle start date"></label>
+            <input type="date" id="mdLtst" style="border: 2px solid var(--primary-color);">
+            
+            <label style="font-weight:700; margin-top: 10px;" data-hi="आपकी एवरेज साइकिल (दिन)" data-en="Your default Cycle length (Days)"></label>
+            <input type="number" id="mdLn" value="28">
+            <button class="btn" style="margin-top: 20px; padding: 20px;" onclick="saveEditorRealtime()" data-hi="सेव करें (Save)" data-en="Save changes locally">Save</button>
+        </div>
+    </div>
+
+    <div class="modal" id="breathModal" style="background: rgba(0,0,0,0.85);">
+        <div class="modal-body" style="height: 65vh; background:transparent; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:none;">
+            <h2 style="color:white; font-size:28px; font-weight:800; text-align:center; margin-bottom:10px;" data-hi="आंखें बंद करें और..." data-en="Close your eyes and..."></h2>
+            <div class="breath-circle" id="brCirc" data-hi="सांस लें" data-en="Breathe In">Breathe In</div>
+            <p id="brText" style="color:#EAEAEA; font-size:18px; font-weight:600; text-align:center; margin-top:20px;"></p>
+            <button class="btn" style="background:white; color:#8A2BE2; margin-top:auto; max-width:250px;" onclick="closeBreathModal()" data-hi="खत्म करें" data-en="Finish">Finish</button>
+        </div>
+    </div>
+
+    <div class="navbar-base">
+        <a onclick="location.href='index.html'" class="nav-link active"><div class="icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div></a>
+        <a onclick="location.href='calendar.html'" class="nav-link"><div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div></a>
+        <a onclick="location.href='symptoms.html'" class="nav-link center-btn"><div class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div></a>
+        <a onclick="location.href='tools.html'" class="nav-link"><div class="icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div></a>
+        <a onclick="location.href='settings.html'" class="nav-link"><div class="icon"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line></svg></div></a>
+    </div>
+
+    <script>
+        const appMem = JSON.parse(localStorage.getItem('userData'));
+        let configMem = JSON.parse(localStorage.getItem('appConfig')) || { lang: 'hi', pregMode: false };
+        let actCycleMs, targEnd;
+        let ltTimerHandle;
+
+        function setToast(msg, ok=true) {
+            let el = document.getElementById('gToast');
+            document.getElementById('gToastIco').innerText = ok ? "💖" : "⚠️";
+            document.getElementById('gToastMsg').innerText = msg;
+            el.className="show"; setTimeout(()=>el.className="", 3500);
+        }
+        function uiTxtRender() {
+            document.querySelectorAll('[data-'+configMem.lang+']').forEach(nd => {
+                nd.innerHTML = nd.getAttribute('data-'+configMem.lang).replace('{n}', appMem?appMem.name:'User');
+            });
+            if(appMem) document.getElementById('usrNm').innerText = appMem.name;
+        }
+
+        // --- 🧠 SMART JAVA SYNC ---
+        function syncWithAndroid() {
+            if (!window.Android || !window.Android.scheduleSmartAlarm || !appMem) return;
+            try {
+                let wtState = JSON.parse(localStorage.getItem('waterLog')) || { count: 0, dt: new Date().toDateString() };
+                if (wtState.dt !== new Date().toDateString()) wtState.count = 0;
+                
+                let freq = localStorage.getItem('lastFreqKey') || "DAILY";
+                if(localStorage.getItem('masterToglStatus') === "NO") freq = "OFF";
+                
+                window.Android.scheduleSmartAlarm(appMem.lastDate, appMem.cycleLength.toString(), freq, configMem.lang, appMem.name || "Beautiful", wtState.count);
+            } catch(e) {}
+        }
+
+        function runMasterCalculator(user) {
+            const curStr = new Date().getTime();
+            const lr = new Date(user.lastDate).setHours(0,0,0,0);
+            actCycleMs = parseInt(user.cycleLength) * 86400000;
+            const diffCys = Math.floor((curStr - lr) / actCycleMs);
+            let latestSt = lr + Math.max(0, diffCys * actCycleMs);
+            targEnd = latestSt + actCycleMs; 
+            if(configMem.pregMode) return { tp: 'PREG' };
+            return { rawEnd: targEnd }; 
+        }
+
+        function spinLiveCountdowns() {
+             const nowMs = new Date().getTime();
+             let dr = targEnd - nowMs;
+             let msgPh = ""; let pillsTag = ""; let vTxt = "";
+             
+             if (dr <= 0) {
+                  let dx = Math.ceil(Math.abs(dr) / 86400000);
+                  msgPh = configMem.lang=='hi'?`प्रिय ${appMem.name}, आपका पीरियड डिले हो रहा है। कृपया स्ट्रेस न लें और आराम करें। 💖`:`Looks like your period is delayed, ${appMem.name}. Rest well! 💖`;
+                  pillsTag = configMem.lang=='hi'?"पीरियड मिस हुआ":"Period Late"; vTxt = `${dx} Late`;
+                  document.getElementById('cStroke').style.stroke = "#FF426A";
+             } else {
+                 let tDy = Math.floor(dr / 86400000);
+                 let rMod = dr % 86400000;
+                 document.getElementById('ltH').innerText = Math.floor(rMod / 3600000).toString().padStart(2,'0');
+                 document.getElementById('ltM').innerText = Math.floor((rMod % 3600000) / 60000).toString().padStart(2,'0');
+                 document.getElementById('ltS').innerText = Math.floor((rMod % 60000)/ 1000).toString().padStart(2,'0');
+                 
+                 vTxt = tDy; pillsTag = (configMem.lang=='hi'?"स्वस्थ ट्रैक":"Safe Phase");
+
+                 if(tDy <= 14 && tDy >=12) {
+                     msgPh = configMem.lang=='hi'?"आज आप बहुत ऊर्जावान (Energetic) और खुश महसूस कर सकती हैं! 🌟":"You might feel very energetic and radiant today! 🌟"; pillsTag="फर्टाइल / ओवुलेशन";
+                     document.getElementById('cStroke').style.stroke = "#FFAA2B";
+                 } else if (tDy < 3) {
+                     msgPh = configMem.lang=='hi'?`डेट्स नज़दीक हैं ${appMem.name}, गरम पानी पिएं और हीटिंग पैड तैयार रखें। 🔥`:`Getting closer, ${appMem.name}. Keep your heating pad ready. 🔥`;
+                 } else { 
+                     msgPh = configMem.lang=='hi'?"आपका शरीर अंदर से हील हो रहा है। अपना ख्याल रखें! 💖":"Your body is naturally healing today! 💖"; document.getElementById('cStroke').style.stroke = "url(#dynamicGrad)"; 
+                 }
+                 document.getElementById('cStroke').style.strokeDashoffset = 754 - (((actCycleMs - dr) / actCycleMs) * 754);
+             }
+
+             if(configMem.pregMode) {
+                 document.body.classList.add('preg-mode'); 
+                 document.getElementById('ovPhaseMsg').innerText = configMem.lang=='hi'?"एक नन्ही जान आपके अंदर पल रही है ✨👶🏻":"A little miracle is growing inside you ✨👶🏻";
+                 document.getElementById('lblTimer').innerText = configMem.lang=='hi'?"हफ्ते (Weeks)":"Weeks Baby";
+                 document.getElementById('timeCounter').style.display = "none";
+                 document.getElementById('txtDaysVal').innerText = "W"+Math.floor((nowMs - new Date(appMem.lastDate).getTime())/604800000); 
+                 document.getElementById('cStroke').style.strokeDashoffset = 0; 
+                 document.getElementById('progPillsTag').innerText = "Baby Mode 💙";
+                 return;
+             }
+             document.getElementById('progPillsTag').innerText = pillsTag;
+             document.getElementById('txtDaysVal').innerText = vTxt; 
+             document.getElementById('ovPhaseMsg').innerText = msgPh; 
+        }
+
+        function loadHeartFeatures() {
+            let qtsHi =["आप जैसी हैं, बहुत खूबसूरत और स्ट्रॉन्ग हैं। 💖", "आज खुद को थोड़ा एक्स्ट्रा प्यार दें। 🌸", "मुस्कुराइए, आपकी मुस्कान बहुत प्यारी है। ✨", "खुद पर भरोसा रखें, आप सब कुछ कर सकती हैं! 🦋"];
+            let qtsEn =["You are strong, beautiful, and enough. 💖", "Give yourself some extra love today. 🌸", "Your smile makes the world brighter. ✨", "Believe in yourself, you are magic! 🦋"];
+            document.getElementById('dailyQuoteTxt').innerText = configMem.lang=='hi' ? qtsHi[new Date().getDay()%4] : qtsEn[new Date().getDay()%4];
+
+            let wtState = JSON.parse(localStorage.getItem('waterLog')) || {dt: new Date().toDateString(), count: 0, arr: [0,0,0,0,0,0]};
+            if(wtState.dt !== new Date().toDateString()) wtState = {dt: new Date().toDateString(), count: 0, arr:[0,0,0,0,0,0]};
+            
+            let gBtns = document.querySelectorAll('.glass-btn');
+            wtState.arr.forEach((v, i) => { if(v) gBtns[i].classList.add('filled'); });
+            document.getElementById('wCount').innerText = `${wtState.count}/6`;
+            localStorage.setItem('waterLog', JSON.stringify(wtState));
+        }
+
+        function tgWater(el, idx) {
+            let wtState = JSON.parse(localStorage.getItem('waterLog'));
+            if(wtState.arr[idx] == 0) {
+                wtState.arr[idx] = 1; wtState.count++; el.classList.add('filled');
+                setToast(configMem.lang=='hi'?"बहुत बढ़िया! पानी पीते रहें 💧":"Great job! Keep drinking water 💧", true);
+            } else { wtState.arr[idx] = 0; wtState.count--; el.classList.remove('filled'); }
+            document.getElementById('wCount').innerText = `${wtState.count}/6`;
+            localStorage.setItem('waterLog', JSON.stringify(wtState));
+            syncWithAndroid(); // SYNC UPDATED WATER LEVEL IMMEDIATELY!
+        }
+
+        let breathInt;
+        function openBreathModal() {
+            document.getElementById('breathModal').style.display = 'flex';
+            let cr = document.getElementById('brCirc'); let txt = document.getElementById('brText');
+            function seq() {
+                cr.innerText = configMem.lang=='hi'?"सांस अंदर लें...":"Breathe In..."; cr.classList.add('breath-scale-up'); txt.innerText = "4 Seconds";
+                setTimeout(()=>{ cr.innerText = configMem.lang=='hi'?"रोके रखें...":"Hold..."; txt.innerText = "7 Seconds"; }, 4000);
+                setTimeout(()=>{ cr.innerText = configMem.lang=='hi'?"धीरे से छोड़ें...":"Breathe Out..."; cr.classList.remove('breath-scale-up'); txt.innerText = "8 Seconds"; }, 11000);
+            }
+            seq(); breathInt = setInterval(seq, 19000);
+        }
+        function closeBreathModal() { document.getElementById('breathModal').style.display = 'none'; clearInterval(breathInt); }
+
+        function startupSeq() {
+             if(appMem) {
+                  document.getElementById('dashBoardGate').style.display = 'block';
+                  document.getElementById('cTxtDt').innerText = appMem.cycleLength + " Days";
+                  document.getElementById('cNxDt').innerText = new Date(runMasterCalculator(appMem).rawEnd || targEnd).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+                  uiTxtRender(); spinLiveCountdowns(); loadHeartFeatures(); syncWithAndroid();
+                  ltTimerHandle = setInterval(spinLiveCountdowns, 1000);
+             } else { document.getElementById('initGate').style.display = 'block'; uiTxtRender(); }
+        }
+        function testTempSwitch(lg){ configMem.lang=lg; uiTxtRender(); }
+
+        function saveAuth() {
+            let usName=document.getElementById('regUser').value; let ltDat=document.getElementById('regDate').value;
+            if(!usName||!ltDat){ setToast("कृपया सभी जानकारी भरें! ⚠️", false); return; }
+            localStorage.setItem('userData', JSON.stringify({name:usName,age:document.getElementById('regAge').value,lastDate:ltDat,cycleLength:document.getElementById('regCycle').value,duration:document.getElementById('regFlow').value}));
+            localStorage.setItem('appConfig', JSON.stringify(configMem)); 
+            setToast("Setting up your profile! 💖", true); setTimeout(()=>location.reload(), 1200);
+        }
+
+        function popEditor() { document.getElementById('mdLtst').value = appMem.lastDate; document.getElementById('mdLn').value = appMem.cycleLength; document.getElementById('modaleditor').classList.add('open'); }
+        function closeEditor() { document.getElementById('modaleditor').classList.remove('open'); }
+        
+        function saveEditorRealtime() {
+            appMem.lastDate = document.getElementById('mdLtst').value; appMem.cycleLength = document.getElementById('mdLn').value;
+            localStorage.setItem('userData', JSON.stringify(appMem));
+            closeEditor(); setToast(configMem.lang=='hi'?"नया डाटा सेव हो गया! 🎯":"New info LIVE tracked!", true); 
+            clearInterval(ltTimerHandle); startupSeq();
+        }
+        document.addEventListener('DOMContentLoaded', startupSeq);
+    </script>
+</body>
+</html>
