@@ -74,8 +74,9 @@
     </div>
 
     <script>
-        let mnCfg = JSON.parse(localStorage.getItem('appConfig'))||{lang:'hi', pregMode:false};
+        let mnCfg = JSON.parse(localStorage.getItem('appConfig'))||{lang:'hi', pregMode:false, alerts:{period:true, water:true, love:true}};
         let amData = JSON.parse(localStorage.getItem('userData'));
+        if(!mnCfg.alerts) mnCfg.alerts = {period:true, water:true, love:true};
         if(mnCfg.pregMode) document.body.classList.add('preg-mode');
 
         // --- 🧠 SMART JAVA SYNC ---
@@ -85,7 +86,11 @@
                 let wtState = JSON.parse(localStorage.getItem('waterLog')) || { count: 0 };
                 let freq = localStorage.getItem('lastFreqKey') || "DAILY";
                 if(localStorage.getItem('masterToglStatus') === "NO") freq = "OFF";
-                window.Android.scheduleSmartAlarm(amData.lastDate, amData.cycleLength.toString(), freq, mnCfg.lang, amData.name || "Beautiful", wtState.count);
+                window.Android.scheduleSmartAlarm(
+                    amData.lastDate, amData.cycleLength.toString(), freq, 
+                    mnCfg.lang, amData.name || "Beautiful", wtState.count,
+                    mnCfg.alerts.period, mnCfg.alerts.water, mnCfg.alerts.love
+                );
             } catch(e) {}
         }
 
@@ -101,7 +106,7 @@
              else msgBx.innerText = mnCfg.lang=='hi' ? "आपका शरीर हिम्मत का रूप है। थोड़ा आराम करें और गर्म चाय या पानी पिएं। ✨" : "Your body is doing a lot of hard work. Take some rest ✨";
 
              document.getElementById('succPxMnGkQc').style.display = "flex";
-             syncWithAndroid(); // SYNC MOOD/ACTIVITY UPDATES
+             syncWithAndroid(); 
              setTimeout(()=> { document.getElementById('succPxMnGkQc').style.display="none"; }, 4500); 
         }
 
