@@ -54,7 +54,6 @@
         .card-dual { display: grid; grid-template-columns: 1fr 1fr; gap:15px; margin: 0 20px; }
         .edit-icn { cursor:pointer; width:36px; height:36px; background:var(--primary-color); color:white; border-radius:12px; display:flex; align-items:center; justify-content:center; opacity: 0.9; box-shadow: 0 4px 10px rgba(255, 90, 122, 0.3); transition: 0.3s;} .edit-icn:active{ transform:scale(0.9); }
 
-        /* Floating Glass Nav */
         .navbar-base { position:fixed; bottom: 20px; left: 20px; right: 20px; height: 75px; display:flex; justify-content:space-around; align-items:center; background:rgba(255,255,255,0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index:9999; border-radius: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5);}
         .nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; width: 60px; height: 100%; cursor: pointer; color: #B0AFB5;}
         .nav-link.active { color: var(--primary-color); }
@@ -75,8 +74,8 @@
         @keyframes fade {from {opacity:0} to {opacity:1}}
 
         .quote-box { background: rgba(255, 255, 255, 0.6); padding: 12px 20px; border-radius: 20px; margin: 0 24px 15px; font-style: italic; color: #555; font-weight: 600; font-size: 14px; text-align: center; border: 1px dashed rgba(255, 90, 122, 0.3); }
-        .water-grid { display: flex; gap: 8px; justify-content: space-between; margin-top: 15px; }
-        .glass-btn { width: 35px; height: 40px; border-radius: 8px; background: #EAEAEA; display:flex; align-items:center; justify-content:center; font-size: 20px; cursor: pointer; transition: 0.3s; }
+        .water-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .glass-btn { height: 45px; border-radius: 12px; background: #EAEAEA; display:flex; align-items:center; justify-content:center; font-size: 22px; cursor: pointer; transition: 0.3s; }
         .glass-btn.filled { background: #5AA1FF; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(90, 161, 255, 0.4); }
         
         .relax-btn-huge { width: calc(100% - 40px); margin: 20px; background: linear-gradient(135deg, #8A2BE2, #DDA0DD); color: white; border-radius: 25px; padding: 20px; text-align: center; font-weight: 800; font-size: 16px; box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3); cursor: pointer; transition: 0.3s; display:flex; justify-content:center; align-items:center; gap:10px;}
@@ -184,11 +183,14 @@
         </div>
 
         <div class="card" style="margin-top:20px; border-radius:30px;">
-            <h3 style="margin:0; font-size:18px; color:#333; display:flex; justify-content:space-between;">
-                <span data-hi="💧 पानी पीना न भूलें" data-en="💧 Stay Hydrated"></span>
-                <span id="wCount" style="color:#5AA1FF;">0/6</span>
+            <h3 style="margin:0; font-size:18px; color:#333; display:flex; justify-content:space-between; align-items:center;">
+                <span data-hi="💧 पानी का लक्ष्य" data-en="💧 Hydration Goal"></span>
+                <div style="text-align:right;">
+                    <span id="wCount" style="color:#5AA1FF; font-weight:800; font-size:20px;">0.0 L</span>
+                    <div style="font-size:12px; color:#888; font-weight:600;" id="wGlassCount">0/8 Glasses</div>
+                </div>
             </h3>
-            <p style="margin:5px 0 0 0; font-size:13px; color:#888; font-weight:600;" data-hi="खुद को हाइड्रेटेड रखें, इससे दर्द में आराम मिलेगा।" data-en="Drinking water reduces cramps significantly."></p>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#888; font-weight:600;" data-hi="दिनभर में 2 लीटर पानी पिएं, इससे दर्द में आराम मिलेगा।" data-en="Drink 2 Liters daily to reduce cramps significantly."></p>
             <div class="water-grid">
                 <div class="glass-btn" onclick="tgWater(this, 0)">🥛</div>
                 <div class="glass-btn" onclick="tgWater(this, 1)">🥛</div>
@@ -196,6 +198,8 @@
                 <div class="glass-btn" onclick="tgWater(this, 3)">🥛</div>
                 <div class="glass-btn" onclick="tgWater(this, 4)">🥛</div>
                 <div class="glass-btn" onclick="tgWater(this, 5)">🥛</div>
+                <div class="glass-btn" onclick="tgWater(this, 6)">🥛</div>
+                <div class="glass-btn" onclick="tgWater(this, 7)">🥛</div>
             </div>
         </div>
     </div>
@@ -232,9 +236,9 @@
 
     <script>
         const appMem = JSON.parse(localStorage.getItem('userData'));
-        let configMem = JSON.parse(localStorage.getItem('appConfig')) || { lang: 'hi', pregMode: false };
-        let actCycleMs, targEnd;
-        let ltTimerHandle;
+        let configMem = JSON.parse(localStorage.getItem('appConfig')) || { lang: 'hi', pregMode: false, alerts:{period:true, water:true, love:true} };
+        if(!configMem.alerts) configMem.alerts = {period:true, water:true, love:true};
+        let actCycleMs, targEnd, ltTimerHandle;
 
         function setToast(msg, ok=true) {
             let el = document.getElementById('gToast');
@@ -259,7 +263,11 @@
                 let freq = localStorage.getItem('lastFreqKey') || "DAILY";
                 if(localStorage.getItem('masterToglStatus') === "NO") freq = "OFF";
                 
-                window.Android.scheduleSmartAlarm(appMem.lastDate, appMem.cycleLength.toString(), freq, configMem.lang, appMem.name || "Beautiful", wtState.count);
+                window.Android.scheduleSmartAlarm(
+                    appMem.lastDate, appMem.cycleLength.toString(), freq, 
+                    configMem.lang, appMem.name || "Beautiful", wtState.count,
+                    configMem.alerts.period, configMem.alerts.water, configMem.alerts.love
+                );
             } catch(e) {}
         }
 
@@ -285,8 +293,7 @@
                   pillsTag = configMem.lang=='hi'?"पीरियड मिस हुआ":"Period Late"; vTxt = `${dx} Late`;
                   document.getElementById('cStroke').style.stroke = "#FF426A";
              } else {
-                 let tDy = Math.floor(dr / 86400000);
-                 let rMod = dr % 86400000;
+                 let tDy = Math.floor(dr / 86400000); let rMod = dr % 86400000;
                  document.getElementById('ltH').innerText = Math.floor(rMod / 3600000).toString().padStart(2,'0');
                  document.getElementById('ltM').innerText = Math.floor((rMod % 3600000) / 60000).toString().padStart(2,'0');
                  document.getElementById('ltS').innerText = Math.floor((rMod % 60000)/ 1000).toString().padStart(2,'0');
@@ -294,7 +301,7 @@
                  vTxt = tDy; pillsTag = (configMem.lang=='hi'?"स्वस्थ ट्रैक":"Safe Phase");
 
                  if(tDy <= 14 && tDy >=12) {
-                     msgPh = configMem.lang=='hi'?"आज आप बहुत ऊर्जावान (Energetic) और खुश महसूस कर सकती हैं! 🌟":"You might feel very energetic and radiant today! 🌟"; pillsTag="फर्टाइल / ओवुलेशन";
+                     msgPh = configMem.lang=='hi'?"आज आप बहुत ऊर्जावान और खुश महसूस कर सकती हैं! 🌟":"You might feel very energetic and radiant today! 🌟"; pillsTag="फर्टाइल / ओवुलेशन";
                      document.getElementById('cStroke').style.stroke = "#FFAA2B";
                  } else if (tDy < 3) {
                      msgPh = configMem.lang=='hi'?`डेट्स नज़दीक हैं ${appMem.name}, गरम पानी पिएं और हीटिंग पैड तैयार रखें। 🔥`:`Getting closer, ${appMem.name}. Keep your heating pad ready. 🔥`;
@@ -319,28 +326,34 @@
              document.getElementById('ovPhaseMsg').innerText = msgPh; 
         }
 
+        function updateWaterUI(wtState) {
+            let gBtns = document.querySelectorAll('.glass-btn');
+            wtState.arr.forEach((v, i) => { if(v) gBtns[i].classList.add('filled'); else gBtns[i].classList.remove('filled'); });
+            document.getElementById('wGlassCount').innerText = `${wtState.count}/8 Glasses`;
+            document.getElementById('wCount').innerText = ((wtState.count * 250) / 1000).toFixed(1) + " L";
+        }
+
         function loadHeartFeatures() {
             let qtsHi =["आप जैसी हैं, बहुत खूबसूरत और स्ट्रॉन्ग हैं। 💖", "आज खुद को थोड़ा एक्स्ट्रा प्यार दें। 🌸", "मुस्कुराइए, आपकी मुस्कान बहुत प्यारी है। ✨", "खुद पर भरोसा रखें, आप सब कुछ कर सकती हैं! 🦋"];
             let qtsEn =["You are strong, beautiful, and enough. 💖", "Give yourself some extra love today. 🌸", "Your smile makes the world brighter. ✨", "Believe in yourself, you are magic! 🦋"];
             document.getElementById('dailyQuoteTxt').innerText = configMem.lang=='hi' ? qtsHi[new Date().getDay()%4] : qtsEn[new Date().getDay()%4];
 
-            let wtState = JSON.parse(localStorage.getItem('waterLog')) || {dt: new Date().toDateString(), count: 0, arr: [0,0,0,0,0,0]};
-            if(wtState.dt !== new Date().toDateString()) wtState = {dt: new Date().toDateString(), count: 0, arr:[0,0,0,0,0,0]};
+            let wtState = JSON.parse(localStorage.getItem('waterLog')) || {dt: new Date().toDateString(), count: 0, arr:[0,0,0,0,0,0,0,0]};
+            if(wtState.dt !== new Date().toDateString() || wtState.arr.length < 8) wtState = {dt: new Date().toDateString(), count: 0, arr:[0,0,0,0,0,0,0,0]};
             
-            let gBtns = document.querySelectorAll('.glass-btn');
-            wtState.arr.forEach((v, i) => { if(v) gBtns[i].classList.add('filled'); });
-            document.getElementById('wCount').innerText = `${wtState.count}/6`;
+            updateWaterUI(wtState);
             localStorage.setItem('waterLog', JSON.stringify(wtState));
         }
 
         function tgWater(el, idx) {
             let wtState = JSON.parse(localStorage.getItem('waterLog'));
             if(wtState.arr[idx] == 0) {
-                wtState.arr[idx] = 1; wtState.count++; el.classList.add('filled');
+                wtState.arr[idx] = 1; wtState.count++; 
                 setToast(configMem.lang=='hi'?"बहुत बढ़िया! पानी पीते रहें 💧":"Great job! Keep drinking water 💧", true);
-            } else { wtState.arr[idx] = 0; wtState.count--; el.classList.remove('filled'); }
-            document.getElementById('wCount').innerText = `${wtState.count}/6`;
+            } else { wtState.arr[idx] = 0; wtState.count--; }
+            
             localStorage.setItem('waterLog', JSON.stringify(wtState));
+            updateWaterUI(wtState);
             syncWithAndroid(); // SYNC UPDATED WATER LEVEL IMMEDIATELY!
         }
 
